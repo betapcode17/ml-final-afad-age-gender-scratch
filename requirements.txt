@@ -1,0 +1,1 @@
+# Danh sách thư viện cần thiết cho dự án (PyTorch / torchvision / numpy / pandas / scikit-learn / matplotlib / seaborn / streamlit / pyyaml / tqdm / pillow)

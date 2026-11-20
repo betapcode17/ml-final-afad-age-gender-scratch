@@ -1,0 +1,6 @@
+# Cấu hình siêu tham số cho mô hình ResNet-18 (train from scratch)
+# - model_name: resnet18
+# - pretrained: false (bắt buộc train từ đầu)
+# - img_size: 128 hoặc 224
+# - epochs: 20
+# - batch_size, learning_rate, optimizer, scheduler, loss_weights (gender vs age)
