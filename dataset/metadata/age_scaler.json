@@ -1,0 +1,11 @@
+{
+  "seed": 42,
+  "train_age_mean": 30.8043,
+  "train_age_std": 20.7804,
+  "train_age_min": 1.0,
+  "train_age_max": 110.0,
+  "zscore_forward": "(age - train_age_mean) / train_age_std",
+  "zscore_inverse": "age_norm * train_age_std + train_age_mean",
+  "minmax_100_forward": "age / 100.0",
+  "minmax_100_inverse": "age_norm * 100.0"
+}

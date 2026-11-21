@@ -1,0 +1,4 @@
+split,total_images,female_0,male_1,age_min,age_max,age_mean
+train,11565,5619,5946,1.0,110.0,30.8
+val,2478,1204,1274,1.0,116.0,30.87
+test,2479,1205,1274,1.0,103.0,30.8

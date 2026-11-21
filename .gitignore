@@ -33,11 +33,16 @@ venv.bak/
 .ipynb_checkpoints/
 */.ipynb_checkpoints/*
 
-# Dataset (AFAD-Full & processed data)
-data/raw/*
-!data/raw/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
+# Dataset (raw, interim, processed, external)
+raw_downloads/*
+dataset/raw/*
+!dataset/raw/.gitkeep
+dataset/interim/*
+!dataset/interim/.gitkeep
+dataset/processed/*
+!dataset/processed/.gitkeep
+dataset/external/*
+!dataset/external/.gitkeep
 *.jpg
 *.jpeg
 *.png
