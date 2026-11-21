@@ -1,7 +1,5 @@
 # Model Registry & Builder (Template mở rộng cho nhiều mô hình)
-# Khi thành viên mới thêm mô hình (ví dụ: mobilenetv2.py, densenet121.py):
-# 1. Import class Backbone mới tại đây (Backbone chỉ cần có thuộc tính `self.out_features`)
-# 2. Đăng ký vào từ điển MODEL_REGISTRY bên dưới
+# Hỗ trợ age_mode='multiclass' (Kiểu A - 9 lớp) và age_mode='coral' (Kiểu B - CORAL 8 ngưỡng).
 
 from src.models.multitask import MultiTaskAgeGender
 from src.models.resnet18 import ResNet18Backbone
@@ -18,8 +16,8 @@ def get_available_models():
     return list(MODEL_REGISTRY.keys())
 
 
-def build_model(model_name, num_genders=2, dropout=0.3):
-    """Khởi tạo MultiTaskAgeGender từ tên mô hình truyền qua --model."""
+def build_model(model_name, age_mode="coral", num_age_groups=9, dropout=0.3):
+    """Khởi tạo MultiTaskAgeGender từ tên mô hình truyền qua --model và --age-mode."""
     key = model_name.lower()
     if key not in MODEL_REGISTRY:
         available = ", ".join(get_available_models())
@@ -28,4 +26,9 @@ def build_model(model_name, num_genders=2, dropout=0.3):
             f"Các mô hình hiện có: [{available}]"
         )
     backbone = MODEL_REGISTRY[key]()
-    return MultiTaskAgeGender(backbone, num_genders=num_genders, dropout=dropout)
+    return MultiTaskAgeGender(
+        backbone,
+        age_mode=age_mode,
+        num_age_groups=num_age_groups,
+        dropout=dropout,
+    )

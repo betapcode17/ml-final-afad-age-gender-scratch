@@ -1,20 +1,19 @@
 # Cấu hình siêu tham số cho mô hình ResNet-18 (train from scratch)
 # - model_name: resnet18
 # - pretrained: false (bắt buộc train từ đầu)
-# - img_size: 128 hoặc 224
-# - epochs: 20
-# - batch_size, learning_rate, optimizer, scheduler, loss_weights (gender vs age)
-
-
+# - age_mode: coral (Kiểu B - CORAL 8 ngưỡng) hoặc multiclass (Kiểu A - CrossEntropy 9 lớp)
+# - img_size: 224
+# - epochs: 30
 
 model : resnet18
 pretrained : false
+age_mode : coral
 img_size : 224
-epochs : 20
+epochs : 30
 batch_size : 64
 lr : 0.001
 augment : true
 vflip : false
 w_gender : 1.0
-w_age : 0.1
+w_age : 3.0
 save_dir : checkpoints

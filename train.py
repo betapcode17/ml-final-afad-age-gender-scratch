@@ -1,5 +1,5 @@
 # Entry point chạy quá trình huấn luyện (Training)
-# Hỗ trợ truyền --model <tên_mô_hình> để dùng chung template cho mọi thành viên trong nhóm.
+# Hỗ trợ truyền --model <tên_mô_hình> và --age-mode <multiclass|coral>
 
 import argparse
 import yaml
@@ -8,7 +8,7 @@ from src.training.train import run_training
 
 
 def parse_args():
-    p = argparse.ArgumentParser(description="Train AFAD Multi-task CNN from scratch")
+    p = argparse.ArgumentParser(description="Train Asian Multi-task CNN from scratch")
     p.add_argument("--config", type=str, default="", help="Đường dẫn file YAML (tùy chọn)")
     p.add_argument(
         "--model",
@@ -17,16 +17,23 @@ def parse_args():
         choices=get_available_models(),
         help="Tên mô hình đã đăng ký trong src/models/builder.py",
     )
+    p.add_argument(
+        "--age-mode",
+        type=str,
+        default="coral",
+        choices=["multiclass", "coral"],
+        help="Kiểu A: multiclass (9 lớp CrossEntropy) | Kiểu B: coral (8 ngưỡng CORAL Loss)",
+    )
     p.add_argument("--splits-dir", type=str, default="dataset/metadata")
-    p.add_argument("--epochs", type=int, default=20)
+    p.add_argument("--epochs", type=int, default=30)
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--img-size", type=int, default=224)
     p.add_argument("--augment", action="store_true")
     p.add_argument("--vflip", action="store_true")
     p.add_argument("--w-gender", type=float, default=1.0)
-    p.add_argument("--w-age", type=float, default=0.1)
-    p.add_argument("--num-workers", type=int, default=2)
+    p.add_argument("--w-age", type=float, default=3.0)
+    p.add_argument("--num-workers", type=int, default=0)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--save-dir", type=str, default="checkpoints")
     p.add_argument("--resume", type=str, default="")
