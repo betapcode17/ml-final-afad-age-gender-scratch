@@ -1,0 +1,17 @@
+{
+  "experiment": "resnet18_typeB",
+  "age_mode": "coral",
+  "best_epoch": 28,
+  "gender_acc": 0.8805970149253731,
+  "gender_precision": 0.8804697581931615,
+  "gender_recall": 0.8806392777347134,
+  "gender_f1": 0.8805338550146267,
+  "gender_roc_auc": 0.9537797116931674,
+  "age_group_acc": 0.5058491327148044,
+  "age_adjacent_acc (\u00b11 group)": 0.9116579265832997,
+  "age_precision": 0.526106450980397,
+  "age_recall": 0.5261192807540579,
+  "age_f1": 0.5240909227100881,
+  "inference_ms_per_img": 4.658,
+  "params_M": 11.18
+}

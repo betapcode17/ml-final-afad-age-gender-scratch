@@ -1,0 +1,12 @@
+{
+  "model": "resnet18",
+  "gender_acc": 0.864461476401775,
+  "gender_f1_macro": 0.8644402781032732,
+  "gender_roc_auc": 0.9437931955418619,
+  "age_mae_all": 6.516986846923828,
+  "age_mae_exact_sources": 6.130023002624512,
+  "age_rmse": 9.538058291352506,
+  "age_cs_5 (%)": 55.34489713594192,
+  "inference_ms_per_img": 4.128,
+  "params_M": 11.18
+}

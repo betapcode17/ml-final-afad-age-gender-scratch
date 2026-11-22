@@ -1,0 +1,34 @@
+{
+  "single_view": {
+    "mode": "Single-View",
+    "gender_acc": 0.891085114965712,
+    "gender_precision": 0.890961886532026,
+    "gender_recall": 0.8911579825035665,
+    "gender_f1": 0.8910314768651293,
+    "gender_roc_auc": 0.9553352397454353,
+    "age_group_acc": 0.4893102057281162,
+    "age_adjacent_acc (\u00b11 group)": 0.9052037111738604,
+    "age_precision": 0.5084551754044894,
+    "age_recall": 0.49769922902093316,
+    "age_f1": 0.4929926316810569,
+    "inference_ms_per_img": 5.134
+  },
+  "tta": {
+    "mode": "TTA (Orig + HFlip)",
+    "gender_acc": 0.8955223880597015,
+    "gender_precision": 0.8954389527882469,
+    "gender_recall": 0.8957222978562636,
+    "gender_f1": 0.8954894640762887,
+    "gender_roc_auc": 0.9583121087566849,
+    "age_group_acc": 0.49052037111738606,
+    "age_adjacent_acc (\u00b11 group)": 0.9100443727309399,
+    "age_precision": 0.5101636683973009,
+    "age_recall": 0.4996257333227351,
+    "age_f1": 0.4954120854110371,
+    "inference_ms_per_img": 4.672,
+    "experiment": "resnet18_typeB_v2",
+    "age_mode": "coral_v2",
+    "best_epoch": 38,
+    "params_M": 11.53
+  }
+}

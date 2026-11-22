@@ -1,5 +1,5 @@
 # Entry point chạy quá trình đánh giá (Evaluation) trên tập Test
-# Hỗ trợ truyền --model <tên_mô_hình> và --age-mode <multiclass|coral>
+# Hỗ trợ --model <resnet18|resnet18_se|resnet18_cbam_ms>, --age-mode <multiclass|coral|coral_v2|coral_v3> và --tta
 
 import argparse
 from src.evaluation.evaluate import run_evaluation
@@ -11,21 +11,22 @@ def parse_args():
     p.add_argument(
         "--model",
         type=str,
-        default="resnet18",
+        default="resnet18_cbam_ms",
         choices=get_available_models(),
         help="Tên mô hình đã đăng ký trong src/models/builder.py",
     )
     p.add_argument(
         "--age-mode",
         type=str,
-        default="coral",
-        choices=["multiclass", "coral"],
-        help="Kiểu A: multiclass (9 lớp) | Kiểu B: coral (8 ngưỡng CORAL)",
+        default="coral_v3",
+        choices=["multiclass", "coral", "coral_v2", "coral_v3"],
+        help="multiclass (02a) | coral (02b) | coral_v2 (02c) | coral_v3 (02d)",
     )
     p.add_argument("--splits-dir", type=str, default="dataset/metadata")
     p.add_argument("--checkpoint", type=str, required=True)
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--img-size", type=int, default=224)
+    p.add_argument("--tta", action="store_true", help="Bật Test-Time Augmentation (gốc + lật ngang)")
     return p.parse_args()
 
 

@@ -1,5 +1,5 @@
 # Entry point chạy quá trình huấn luyện (Training)
-# Hỗ trợ truyền --model <tên_mô_hình> và --age-mode <multiclass|coral>
+# Hỗ trợ truyền --model <resnet18|resnet18_se|resnet18_cbam_ms> và --age-mode <multiclass|coral|coral_v2|coral_v3>
 
 import argparse
 import yaml
@@ -13,19 +13,19 @@ def parse_args():
     p.add_argument(
         "--model",
         type=str,
-        default="resnet18",
+        default="resnet18_cbam_ms",
         choices=get_available_models(),
         help="Tên mô hình đã đăng ký trong src/models/builder.py",
     )
     p.add_argument(
         "--age-mode",
         type=str,
-        default="coral",
-        choices=["multiclass", "coral"],
-        help="Kiểu A: multiclass (9 lớp CrossEntropy) | Kiểu B: coral (8 ngưỡng CORAL Loss)",
+        default="coral_v3",
+        choices=["multiclass", "coral", "coral_v2", "coral_v3"],
+        help="multiclass (02a) | coral (02b) | coral_v2 (02c) | coral_v3 (02d CBAM+MultiScale)",
     )
     p.add_argument("--splits-dir", type=str, default="dataset/metadata")
-    p.add_argument("--epochs", type=int, default=30)
+    p.add_argument("--epochs", type=int, default=40)
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--img-size", type=int, default=224)

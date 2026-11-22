@@ -1,4 +1,4 @@
-# Đánh giá mô hình trên tập Test cho cả Kiểu A (multiclass) và Kiểu B (coral)
+# Đánh giá mô hình trên tập Test cho Kiểu A (multiclass), Kiểu B (coral) và Kiểu B+ (coral_v2, hỗ trợ TTA)
 
 import json
 import os
@@ -20,7 +20,8 @@ from src.utils.checkpoint import load_checkpoint
 
 def run_evaluation(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    age_mode = getattr(args, "age_mode", "coral")
+    age_mode = getattr(args, "age_mode", "coral_v2")
+    use_tta = getattr(args, "tta", True)
 
     _, val_tf = get_transforms(args.img_size, augment=False)
     test_ds = AFADDataset(os.path.join(args.splits_dir, "test.csv"), val_tf)
@@ -34,7 +35,7 @@ def run_evaluation(args):
     t0 = time.time()
     with torch.no_grad():
         for imgs, genders, age_groups in test_loader:
-            g_prob, a_pred_grp, _ = model.predict_proba(imgs.to(device))
+            g_prob, a_pred_grp, _ = model.predict_proba(imgs.to(device), tta=use_tta)
             all_g_prob.append(g_prob.cpu().numpy())
             all_g_true.append(genders.numpy())
             all_a_pred.append(a_pred_grp.cpu().numpy())
@@ -52,6 +53,7 @@ def run_evaluation(args):
     tag = f"{args.model}_{age_mode}"
     metrics["model"] = tag
     metrics["age_mode"] = age_mode
+    metrics["tta"] = use_tta
     metrics["inference_ms_per_img"] = round(infer_ms, 3)
     metrics["params_M"] = round(sum(p.numel() for p in model.parameters()) / 1e6, 2)
 

@@ -46,6 +46,7 @@ dataset/external/*
 *.jpg
 *.jpeg
 *.png
+!train_results/**/*.png
 *.zip
 *.tar.gz
 *.7z

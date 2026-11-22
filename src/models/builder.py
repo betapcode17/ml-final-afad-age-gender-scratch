@@ -1,13 +1,26 @@
 # Model Registry & Builder (Template mở rộng cho nhiều mô hình)
-# Hỗ trợ age_mode='multiclass' (Kiểu A - 9 lớp) và age_mode='coral' (Kiểu B - CORAL 8 ngưỡng).
+# Hỗ trợ resnet18, resnet18_se, resnet18_cbam_ms và age_mode in {'multiclass', 'coral', 'coral_v2', 'coral_v3'}.
 
 from src.models.multitask import MultiTaskAgeGender
-from src.models.resnet18 import ResNet18Backbone
+from src.models.resnet18 import ResNet18Backbone, ResNet18CustomBackbone
+
+
+def _build_resnet18():
+    return ResNet18Backbone(use_se=False)
+
+
+def _build_resnet18_se():
+    return ResNet18Backbone(use_se=True)
+
+
+def _build_resnet18_cbam_ms():
+    return ResNet18CustomBackbone()
+
 
 MODEL_REGISTRY = {
-    "resnet18": ResNet18Backbone,
-    # "mobilenetv2": MobileNetV2Backbone,
-    # "densenet121": DenseNet121Backbone,
+    "resnet18": _build_resnet18,
+    "resnet18_se": _build_resnet18_se,
+    "resnet18_cbam_ms": _build_resnet18_cbam_ms,
 }
 
 
@@ -16,7 +29,7 @@ def get_available_models():
     return list(MODEL_REGISTRY.keys())
 
 
-def build_model(model_name, age_mode="coral", num_age_groups=9, dropout=0.3):
+def build_model(model_name, age_mode="coral_v3", num_age_groups=9, dropout=0.3):
     """Khởi tạo MultiTaskAgeGender từ tên mô hình truyền qua --model và --age-mode."""
     key = model_name.lower()
     if key not in MODEL_REGISTRY:
