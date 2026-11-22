@@ -8,6 +8,7 @@ from torch.utils.data import Dataset
 
 AGE_GROUPS_9 = ["0-2", "3-9", "10-19", "20-29", "30-39", "40-49", "50-59", "60-69", "70+"]
 AGE_GROUP_TO_IDX = {g: i for i, g in enumerate(AGE_GROUPS_9)}
+AGE_CUTOFFS_8 = [2.5, 9.5, 19.5, 29.5, 39.5, 49.5, 59.5, 69.5]
 
 
 def map_age_to_group_idx(age_val: float) -> int:
@@ -39,7 +40,6 @@ def create_afad_splits(data_root, splits_dir="data/splits", val_ratio=0.15, test
             continue
         age = float(age_dir)
         age_grp = AGE_GROUPS_9[map_age_to_group_idx(age)]
-        # Quy ước thống nhất toàn dự án: 0 = Female (112), 1 = Male (111)
         for g_code, g_label in [("112", 0), ("111", 1)]:
             for p in glob.glob(os.path.join(data_root, age_dir, g_code, "*.jpg")):
                 if os.path.getsize(p) > 0:
@@ -64,13 +64,13 @@ def create_afad_splits(data_root, splits_dir="data/splits", val_ratio=0.15, test
 
 
 class AFADDataset(Dataset):
-    """Dataset khuôn mặt Châu Á trả về:
-    - img: Tensor (3, H, W)
-    - gender: float32 (0.0 = Female, 1.0 = Male) cho nhánh Sigmoid / BCEWithLogitsLoss
-    - age_group_idx: int64 (0..8 tương ứng 9 nhóm tuổi '0-2' .. '70+')
+    """Dataset khuôn mặt Châu Á:
+    - Mặc định (return_exact_age=False): trả về (img, gender_float32, age_group_idx_0_to_8)
+    - Khi return_exact_age=True (dùng cho 02e Soft Ordinal LDL):
+      trả về thêm (age_exact_float32, has_exact_age_float32 [1.0 nếu != FairFace, 0.0 nếu == FairFace])
     """
 
-    def __init__(self, csv_path, transform=None, img_root_override=None):
+    def __init__(self, csv_path, transform=None, img_root_override=None, return_exact_age=False):
         self.df = pd.read_csv(csv_path)
         if img_root_override:
             self.df["image_path"] = (
@@ -79,6 +79,7 @@ class AFADDataset(Dataset):
                 .str.replace("dataset/processed", img_root_override, regex=False)
             )
         self.transform = transform
+        self.return_exact_age = return_exact_age
 
     def __len__(self):
         return len(self.df)
@@ -95,4 +96,10 @@ class AFADDataset(Dataset):
         else:
             ag_idx = map_age_to_group_idx(float(row["age"]))
         age_group = torch.tensor(ag_idx, dtype=torch.long)
+
+        if self.return_exact_age:
+            age_exact = torch.tensor(float(row["age"]) if "age" in row and pd.notna(row["age"]) else 0.0, dtype=torch.float32)
+            src = str(row["source"]).strip() if "source" in row and pd.notna(row["source"]) else ""
+            has_exact = torch.tensor(0.0 if src == "FairFace" else 1.0, dtype=torch.float32)
+            return img, gender, age_group, age_exact, has_exact
         return img, gender, age_group

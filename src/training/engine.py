@@ -6,23 +6,39 @@ from tqdm import tqdm
 
 
 def _decode_age_group(age_logits, age_mode):
-    if age_mode in ("coral", "coral_v2", "coral_v3"):
-        return (torch.sigmoid(age_logits) > 0.5).sum(dim=1).long()
+    if age_mode in ("coral", "coral_v2", "coral_v3", "coral_v4"):
+        probs = torch.cummin(torch.sigmoid(age_logits), dim=1).values
+        return (probs > 0.5).sum(dim=1).long()
     return age_logits.argmax(dim=1).long()
+
+
+def _unpack_batch(batch, device):
+    if len(batch) == 5:
+        imgs, genders, age_groups, age_exact, has_exact = batch
+        return (
+            imgs.to(device),
+            genders.to(device),
+            age_groups.to(device),
+            age_exact.to(device),
+            has_exact.to(device),
+        )
+    imgs, genders, age_groups = batch
+    return imgs.to(device), genders.to(device), age_groups.to(device), None, None
 
 
 def train_one_epoch(model, loader, criterion, optimizer, device, grad_clip=1.0):
     model.train()
     loss_sum, g_loss_sum, a_loss_sum = 0.0, 0.0, 0.0
     g_correct, a_correct, a_adj_correct, n = 0, 0, 0, 0
-    for imgs, genders, age_groups in tqdm(loader, desc="Train", leave=False):
-        imgs = imgs.to(device)
-        genders = genders.to(device)
-        age_groups = age_groups.to(device)
+    for batch in tqdm(loader, desc="Train", leave=False):
+        imgs, genders, age_groups, age_exact, has_exact = _unpack_batch(batch, device)
         optimizer.zero_grad()
 
         g_logit, a_logits = model(imgs)
-        loss, lg, la = criterion(g_logit, a_logits, genders, age_groups, return_parts=True)
+        loss, lg, la = criterion(
+            g_logit, a_logits, genders, age_groups,
+            age_exact=age_exact, has_exact=has_exact, return_parts=True,
+        )
         loss.backward()
         if grad_clip and grad_clip > 0:
             torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
@@ -55,13 +71,14 @@ def validate(model, loader, criterion, device):
     model.eval()
     loss_sum, g_loss_sum, a_loss_sum = 0.0, 0.0, 0.0
     g_correct, a_correct, a_adj_correct, n = 0, 0, 0, 0
-    for imgs, genders, age_groups in tqdm(loader, desc="Val", leave=False):
-        imgs = imgs.to(device)
-        genders = genders.to(device)
-        age_groups = age_groups.to(device)
+    for batch in tqdm(loader, desc="Val", leave=False):
+        imgs, genders, age_groups, age_exact, has_exact = _unpack_batch(batch, device)
 
         g_logit, a_logits = model(imgs)
-        loss, lg, la = criterion(g_logit, a_logits, genders, age_groups, return_parts=True)
+        loss, lg, la = criterion(
+            g_logit, a_logits, genders, age_groups,
+            age_exact=age_exact, has_exact=has_exact, return_parts=True,
+        )
 
         bs = imgs.size(0)
         loss_sum += loss.item() * bs

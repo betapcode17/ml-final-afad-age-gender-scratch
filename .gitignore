@@ -47,6 +47,7 @@ dataset/external/*
 *.jpeg
 *.png
 !train_results/**/*.png
+!results/eda/*.png
 *.zip
 *.tar.gz
 *.7z

@@ -13,19 +13,19 @@ def parse_args():
     p.add_argument(
         "--model",
         type=str,
-        default="resnet18_cbam_ms",
+        default="resnet18_hybrid",
         choices=get_available_models(),
         help="Tên mô hình đã đăng ký trong src/models/builder.py",
     )
     p.add_argument(
         "--age-mode",
         type=str,
-        default="coral_v3",
-        choices=["multiclass", "coral", "coral_v2", "coral_v3"],
-        help="multiclass (02a) | coral (02b) | coral_v2 (02c) | coral_v3 (02d CBAM+MultiScale)",
+        default="coral_v4",
+        choices=["multiclass", "coral", "coral_v2", "coral_v3", "coral_v4"],
+        help="multiclass (02a) | coral (02b) | coral_v2 (02c) | coral_v3 (02d) | coral_v4 (02e Ultimate)",
     )
     p.add_argument("--splits-dir", type=str, default="dataset/metadata")
-    p.add_argument("--epochs", type=int, default=40)
+    p.add_argument("--epochs", type=int, default=45)
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--img-size", type=int, default=224)

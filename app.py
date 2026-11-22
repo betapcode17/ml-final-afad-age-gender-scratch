@@ -12,13 +12,14 @@ from src.models.builder import build_model, get_available_models
 
 st.title("Dự đoán Nhóm Tuổi & Giới tính Người Châu Á (Multi-task ResNet-18)")
 models_list = get_available_models()
-default_m_idx = models_list.index("resnet18_cbam_ms") if "resnet18_cbam_ms" in models_list else 0
+default_m_idx = models_list.index("resnet18_hybrid") if "resnet18_hybrid" in models_list else 0
 model_name = st.selectbox("Chọn kiến trúc Backbone", models_list, index=default_m_idx)
 age_mode = st.selectbox(
     "Chọn kiểu nhánh Tuổi",
-    ["coral_v3", "coral_v2", "coral", "multiclass"],
+    ["coral_v4", "coral_v3", "coral_v2", "coral", "multiclass"],
     format_func=lambda m: {
-        "coral_v3": "02d (Mới nhất): CBAM + Multi-Scale + Weighted BCE + Phạt đơn điệu",
+        "coral_v4": "02e (Ultimate): Hybrid CBAM+MHSA + Gender->Age + Soft LDL + Calibrated",
+        "coral_v3": "02d: CBAM + Multi-Scale + Weighted BCE + Phạt đơn điệu",
         "coral_v2": "02c (SE-CORAL v2): Shared CORAL + Focal",
         "coral": "02b (CORAL v1): 8 logits CORAL chuẩn",
         "multiclass": "02a (Baseline): Multi-class 9 lớp Softmax",
@@ -26,6 +27,7 @@ age_mode = st.selectbox(
 )
 use_tta = st.checkbox("Bật TTA (Trung bình ảnh gốc + ảnh lật ngang)", value=True)
 ckpt_defaults = {
+    "coral_v4": "checkpoints/resnet18_typeE_ultimate_best_acc.pth",
     "coral_v3": "checkpoints/resnet18_typeD_cbam_ms_best.pth",
     "coral_v2": "checkpoints/resnet18_typeB_v2_best.pth",
     "coral": "checkpoints/resnet18_typeB_best.pth",

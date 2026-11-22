@@ -236,3 +236,53 @@ class ResNet18CustomBackbone(nn.Module):
     def forward(self, x):
         _, feat34 = self.forward_multiscale(x)
         return feat34
+
+
+class SpatialMHSA7x7(nn.Module):
+    """Multi-Head Self-Attention (4 heads + Learnable 2D PosEmbed) trên 7x7 = 49 tokens cuối layer4
+    giúp đối chiếu tỷ lệ hình học toàn khuôn mặt (mắt - mũi - hàm) trên ảnh nghiêng FairFace/UTKFace."""
+
+    def __init__(self, dim=512, num_heads=4, dropout=0.1, spatial_size=7):
+        super().__init__()
+        self.pos_embed = nn.Parameter(torch.zeros(1, spatial_size * spatial_size, dim))
+        nn.init.trunc_normal_(self.pos_embed, std=0.02)
+        self.norm1 = nn.LayerNorm(dim)
+        self.attn = nn.MultiheadAttention(dim, num_heads=num_heads, dropout=dropout, batch_first=True)
+        self.norm2 = nn.LayerNorm(dim)
+        self.ffn = nn.Sequential(
+            nn.Linear(dim, dim * 2),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(dim * 2, dim),
+            nn.Dropout(dropout),
+        )
+
+    def forward(self, x):
+        b, c, h, w = x.shape
+        tokens = x.flatten(2).transpose(1, 2)  # (B, 49, 512)
+        if tokens.size(1) == self.pos_embed.size(1):
+            tokens = tokens + self.pos_embed
+        t1 = self.norm1(tokens)
+        attn_out, _ = self.attn(t1, t1, t1, need_weights=False)
+        tokens = tokens + attn_out
+        tokens = tokens + self.ffn(self.norm2(tokens))
+        return tokens.transpose(1, 2).reshape(b, c, h, w)
+
+
+class ResNet18HybridBackbone(ResNet18CustomBackbone):
+    """Kiến trúc nâng cấp 02e (Train From Scratch):
+    Deep Stem 3x3 + ResNet-D + CBAM (layer1-4) + SpatialMHSA7x7 (4 heads) + Multi-Scale (layer3 + layer4)."""
+
+    def __init__(self, in_channels=3, num_heads=4):
+        super().__init__(in_channels=in_channels)
+        self.mhsa = SpatialMHSA7x7(dim=512, num_heads=num_heads, dropout=0.1, spatial_size=7)
+
+    def forward_multiscale(self, x):
+        x = self.maxpool(self.stem(x))
+        x = self.layer1(x)
+        x = self.layer2(x)
+        f3 = self.layer3(x)
+        f4 = self.mhsa(self.layer4(f3))
+        feat3 = self.avgpool(f3).flatten(1)  # (B, 256)
+        feat4 = self.avgpool(f4).flatten(1)  # (B, 512)
+        return feat4, torch.cat([feat3, feat4], dim=1)  # (B, 512), (B, 768)

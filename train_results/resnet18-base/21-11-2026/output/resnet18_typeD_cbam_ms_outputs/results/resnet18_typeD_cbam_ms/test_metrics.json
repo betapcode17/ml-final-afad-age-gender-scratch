@@ -1,0 +1,34 @@
+{
+  "single_view": {
+    "mode": "Single-View",
+    "gender_acc": 0.8862444534086326,
+    "gender_precision": 0.8861847651735186,
+    "gender_recall": 0.8861113101480618,
+    "gender_f1": 0.88614572502912,
+    "gender_roc_auc": 0.956363138935753,
+    "age_group_acc": 0.5308592174263816,
+    "age_adjacent_acc (\u00b11 group)": 0.9152884227511093,
+    "age_precision": 0.5405963593049794,
+    "age_recall": 0.5486474482647324,
+    "age_f1": 0.5411249463505665,
+    "inference_ms_per_img": 5.526
+  },
+  "tta": {
+    "mode": "TTA (Orig + HFlip)",
+    "gender_acc": 0.891085114965712,
+    "gender_precision": 0.891047878440367,
+    "gender_recall": 0.890933251691995,
+    "gender_f1": 0.8909853324594743,
+    "gender_roc_auc": 0.96138342984816,
+    "age_group_acc": 0.5401371520774506,
+    "age_adjacent_acc (\u00b11 group)": 0.918112141992739,
+    "age_precision": 0.5502569412628944,
+    "age_recall": 0.5561200604083916,
+    "age_f1": 0.5502539088593419,
+    "inference_ms_per_img": 5.325,
+    "experiment": "resnet18_typeD_cbam_ms",
+    "age_mode": "coral_v3",
+    "best_epoch": 29,
+    "params_M": 11.61
+  }
+}
